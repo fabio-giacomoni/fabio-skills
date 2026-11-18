@@ -49,31 +49,37 @@ Opzioni:
 
 In alternativa, a mano: copia le cartelle che ti interessano da `skills/` dentro `~/.claude/skills/` (o `.claude/skills/` nel progetto).
 
-### Preparare i file per le app (senza terminale)
-
-Le app con interfaccia grafica caricano le skill come file ZIP, uno per skill:
-
-1. In questa pagina GitHub clicca **Code → Download ZIP** ed estrai l'archivio.
-2. Apri la cartella `skills/`: contiene `fabio`, `fabio-economic` e `fabio-poet`.
-3. Comprimi in ZIP ogni cartella che vuoi installare, una per volta (tasto destro → Comprimi). Ogni ZIP deve contenere la cartella della skill con dentro il suo `SKILL.md`, senza cambiarle nome.
-
-Per Fabio completo servono tutti e tre gli ZIP; per le sole verità economiche basta `fabio-economic.zip`, per i soli proverbi `fabio-poet.zip`.
-
 ### App Claude (desktop e web)
+
+Nell'app Claude e su claude.ai le skill non si installano da terminale: si caricano direttamente come file ZIP, uno per skill.
+
+**1. Scarica gli ZIP** dal repository [fabio-giacomoni/fabio-skills](https://github.com/fabio-giacomoni/fabio-skills). Clicca sul nome per scaricare il file:
+
+| File | Skill | Serve per |
+| --- | --- | --- |
+| [`fabio.zip`](https://github.com/fabio-giacomoni/fabio-skills/raw/main/dist/fabio.zip) | `/fabio` | parlare con Fabio |
+| [`fabio-economic.zip`](https://github.com/fabio-giacomoni/fabio-skills/raw/main/dist/fabio-economic.zip) | `/fabio-economic` | le verità economiche |
+| [`fabio-poet.zip`](https://github.com/fabio-giacomoni/fabio-skills/raw/main/dist/fabio-poet.zip) | `/fabio-poet` | i proverbi del poeta |
+
+Per Fabio completo scaricali tutti e tre; altrimenti solo quello che ti interessa. In alternativa apri la cartella [`dist/`](https://github.com/fabio-giacomoni/fabio-skills/tree/main/dist) del repository, clicca sul file e poi sull'icona **Download raw file**.
+
+Non estrarre gli ZIP: vanno caricati così come sono.
+
+**2. Carica gli ZIP su Claude**
 
 1. Apri le impostazioni e cerca la sezione **Skills** (a seconda della versione si trova sotto *Personalizza* / *Customize* oppure *Funzionalità* / *Capabilities*).
 2. Verifica che l'esecuzione di codice e la creazione di file siano attive: le skill ne hanno bisogno.
-3. Clicca sul pulsante per caricare una skill e seleziona uno ZIP; ripeti per ogni skill.
+3. Clicca sul pulsante per caricare una skill e seleziona uno ZIP; ripeti per ogni ZIP scaricato.
 4. Controlla che le skill caricate siano attive.
 
-In una nuova chat scrivi "fammi parlare con Fabio", oppure `/fabio`.
+**3. Parla con Fabio**: in una nuova chat scrivi "fammi parlare con Fabio", oppure `/fabio`.
 
 ### ChatGPT
 
 **Con le Skills di ChatGPT** (disponibili solo su alcuni piani e se abilitate nel tuo workspace):
 
 1. Apri la sezione **Skills** (a seconda della versione si trova nel menu laterale o sotto *Plugins*).
-2. Scegli **Create → Upload from your computer** e seleziona uno ZIP; ripeti per ogni skill.
+2. Scegli **Create → Upload from your computer** e seleziona uno degli ZIP scaricati come spiegato [qui sopra](#app-claude-desktop-e-web); ripeti per ogni skill.
 3. In una nuova chat scrivi "fammi parlare con Fabio".
 
 **Senza Skills** (funziona su qualsiasi piano che abbia i Progetti o i GPT personalizzati):
@@ -150,6 +156,11 @@ npx skills update
 ```
 assets/
 └── cover.png             # immagine di copertina
+build.sh                  # rigenera gli ZIP in dist/
+dist/
+├── fabio.zip             # ZIP pronti da caricare nelle app
+├── fabio-economic.zip
+└── fabio-poet.zip
 skills/
 ├── fabio/
 │   ├── SKILL.md          # istruzioni per interpretare Fabio
@@ -165,3 +176,20 @@ skills/
 - **Personalità**: il carattere di Fabio è descritto in [`skills/fabio/profilo.md`](skills/fabio/profilo.md); il modo di parlare, i difetti da mostrare e i limiti sono in [`skills/fabio/SKILL.md`](skills/fabio/SKILL.md).
 - **Verità economiche**: tutto è in [`skills/fabio-economic/SKILL.md`](skills/fabio-economic/SKILL.md). Per aggiungere frasi basta aggiungerle alla lista `## Esempi`: il modello le usa come base e ne inventa di nuove con la stessa vibe.
 - **Proverbi del poeta**: tutto è in [`skills/fabio-poet/SKILL.md`](skills/fabio-poet/SKILL.md), con la stessa logica: ricetta più lista `## Esempi`.
+
+## Pubblicare
+
+Gli ZIP in `dist/` sono generati dalle cartelle in `skills/`: dopo ogni modifica a una skill vanno rigenerati prima di fare commit e push, altrimenti chi li scarica riceve la versione vecchia.
+
+```bash
+./build.sh            # controlla le skill e ricrea gli ZIP cambiati
+git add -A && git commit -m "..." && git push
+```
+
+Lo script è in bash e richiede il comando `zip` (su Debian/Ubuntu: `sudo apt install zip`). Crea uno ZIP per ogni cartella di `skills/` (quindi anche per le skill aggiunte in futuro), verifica che ogni `SKILL.md` abbia `name` e `description` validi e rimuove gli ZIP delle skill eliminate. Gli ZIP delle skill non modificate restano identici, quindi git segnala solo quelli davvero cambiati.
+
+Per controllare soltanto che `dist/` sia aggiornata, senza scrivere nulla:
+
+```bash
+./build.sh --check
+```
