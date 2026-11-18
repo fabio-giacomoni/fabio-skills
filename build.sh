@@ -1,9 +1,21 @@
 #!/usr/bin/env bash
 # Rigenera gli ZIP delle skill in dist/, uno per ogni cartella di skills/.
 #
+# La versione è nel file VERSION (es. 1.2.0) e corrisponde al tag git v1.2.0.
+# In ogni skill viene scritto un manifest.json con versione e tag, che finisce
+# anche dentro lo ZIP. Il tag è anche nel nome dello ZIP (dist/<skill>-v1.2.0.zip)
+# e i riferimenti agli ZIP nel README vengono riallineati a ogni build.
+#
 # Uso:
-#   ./build.sh            ricrea dist/<skill>.zip per tutte le skill
-#   ./build.sh --check    non scrive nulla: esce con errore se dist/ non è aggiornata
+#   ./build.sh                    ricrea dist/<skill>-<tag>.zip per tutte le skill
+#   ./build.sh --check            non scrive nulla: esce con errore se dist/ o il README non sono aggiornati
+#   ./build.sh --release <vers>   aggiorna VERSION e ricrea gli ZIP con la nuova versione
+#
+# <vers> è un numero (es. 1.2.0) oppure patch, minor o major, che aumentano
+# la cifra corrispondente della versione attuale.
+#
+# Lo script non esegue mai comandi git che modificano il repository: alla fine
+# stampa i comandi per fare commit, creare il tag e pubblicare.
 #
 # Richiede il comando `zip` (su Debian/Ubuntu: sudo apt install zip).
 #
@@ -15,18 +27,60 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS="$ROOT/skills"
 DIST="$ROOT/dist"
+REPO_URL="https://github.com/fabio-giacomoni/fabio-skills"
+
+usage() {
+  echo "Uso: ./build.sh [--check | --release <1.2.3|patch|minor|major>]" >&2
+  exit 2
+}
 
 CHECK=0
+RELEASE=""
 case "${1:-}" in
-  "") ;;
-  --check) CHECK=1 ;;
-  *) echo "Uso: ./build.sh [--check]" >&2; exit 2 ;;
+  "") (( $# == 0 )) || usage ;;
+  --check) (( $# == 1 )) || usage; CHECK=1 ;;
+  --release) (( $# == 2 )) && [[ -n "$2" ]] || usage; RELEASE="$2" ;;
+  --release=*) (( $# == 1 )) && [[ -n "${1#*=}" ]] || usage; RELEASE="${1#*=}" ;;
+  *) usage ;;
 esac
 
 if ! command -v zip >/dev/null 2>&1; then
   echo "ERRORE  manca il comando 'zip' (su Debian/Ubuntu: sudo apt install zip)" >&2
   exit 1
 fi
+
+if [[ ! -f "$ROOT/VERSION" ]]; then
+  echo "ERRORE  manca il file VERSION" >&2
+  exit 1
+fi
+VERSION="$(tr -d '[:space:]' < "$ROOT/VERSION")"
+if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "ERRORE  VERSION deve essere nel formato 1.2.3 (trovato: '$VERSION')" >&2
+  exit 1
+fi
+
+# Con --release la versione da costruire è quella nuova; VERSION viene
+# riscritto solo a build riuscito.
+if [[ -n "$RELEASE" ]]; then
+  IFS=. read -r major minor patch <<< "$VERSION"
+  case "$RELEASE" in
+    major) VERSION="$((major + 1)).0.0" ;;
+    minor) VERSION="$major.$((minor + 1)).0" ;;
+    patch) VERSION="$major.$minor.$((patch + 1))" ;;
+    *)
+      VERSION="${RELEASE#v}"
+      if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "ERRORE  versione non valida: '$RELEASE' (usa 1.2.3, patch, minor o major)" >&2
+        exit 1
+      fi
+      ;;
+  esac
+  if git -C "$ROOT" rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null 2>&1; then
+    echo "ERRORE  il tag v$VERSION esiste già: scegli una versione più alta" >&2
+    exit 1
+  fi
+fi
+TAG="v$VERSION"
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -67,6 +121,19 @@ validate() {
   return "$ok"
 }
 
+# Stampa il manifest.json della skill $1.
+manifest() {
+  cat <<EOF
+{
+  "name": "$1",
+  "version": "$VERSION",
+  "tag": "$TAG",
+  "repository": "$REPO_URL",
+  "updates": "$REPO_URL/tags"
+}
+EOF
+}
+
 # Crea lo ZIP in $2, con la cartella della skill come radice.
 build_zip() {
   local dir="$1" out="$2" name stage
@@ -75,6 +142,7 @@ build_zip() {
 
   mkdir -p "$stage"
   cp -R "$dir" "$stage/$name"
+  manifest "$name" > "$stage/$name/manifest.json"
   # Data e permessi fissi, così lo ZIP non cambia se non cambiano i file.
   find "$stage/$name" -type f -exec chmod 644 {} + -exec touch -t 198001010000 {} +
 
@@ -87,6 +155,7 @@ build_zip() {
 failed=0
 found=0
 expected=" "
+names=()
 
 for dir in "$SKILLS"/*/; do
   [[ -d "$dir" ]] || continue
@@ -99,19 +168,32 @@ for dir in "$SKILLS"/*/; do
     continue
   fi
 
-  target="$DIST/$name.zip"
-  expected+="$name.zip "
+  manifest "$name" > "$TMP/$name.manifest.json"
+  if [[ -f "$dir/manifest.json" ]] && cmp -s "$TMP/$name.manifest.json" "$dir/manifest.json"; then
+    :
+  elif (( CHECK )); then
+    failed=1
+    echo "DA RIFARE   skills/$name/manifest.json"
+  else
+    cp "$TMP/$name.manifest.json" "$dir/manifest.json"
+    echo "aggiornato  skills/$name/manifest.json"
+  fi
+
+  zipname="$name-$TAG.zip"
+  target="$DIST/$zipname"
+  expected+="$zipname "
+  names+=("$name")
   build_zip "$dir" "$TMP/$name.zip"
 
   if [[ -f "$target" ]] && cmp -s "$TMP/$name.zip" "$target"; then
-    echo "ok          dist/$name.zip"
+    echo "ok          dist/$zipname"
   elif (( CHECK )); then
     failed=1
-    echo "DA RIFARE   dist/$name.zip"
+    echo "DA RIFARE   dist/$zipname"
   else
     mkdir -p "$DIST"
     cp "$TMP/$name.zip" "$target"
-    echo "aggiornato  dist/$name.zip"
+    echo "aggiornato  dist/$zipname"
   fi
 done
 
@@ -120,7 +202,7 @@ if (( ! found )); then
   exit 1
 fi
 
-# ZIP rimasti in dist/ per skill che non esistono più.
+# ZIP rimasti in dist/ di versioni precedenti o di skill che non esistono più.
 for stale in "$DIST"/*.zip; do
   [[ -f "$stale" ]] || continue
   base="$(basename "$stale")"
@@ -134,6 +216,24 @@ for stale in "$DIST"/*.zip; do
   fi
 done
 
+# Riallinea nel README i nomi degli ZIP (link e struttura) alla versione corrente.
+if (( ! failed )) && [[ -f "$ROOT/README.md" ]]; then
+  sed_args=()
+  for name in "${names[@]}"; do
+    sed_args+=(-e "s#(^|[^a-z0-9-])$name(-v[0-9]+\\.[0-9]+\\.[0-9]+)?\\.zip#\\1$name-$TAG.zip#g")
+  done
+  sed -E "${sed_args[@]}" "$ROOT/README.md" > "$TMP/README.md"
+  if cmp -s "$TMP/README.md" "$ROOT/README.md"; then
+    :
+  elif (( CHECK )); then
+    failed=1
+    echo "DA RIFARE   README.md (nomi degli ZIP)"
+  else
+    cp "$TMP/README.md" "$ROOT/README.md"
+    echo "aggiornato  README.md (nomi degli ZIP)"
+  fi
+fi
+
 if (( failed )); then
   echo
   if (( CHECK )); then
@@ -142,4 +242,33 @@ if (( failed )); then
     echo "Build non riuscito."
   fi
   exit 1
+fi
+
+# Colori solo se l'output è un terminale (e NO_COLOR non è impostata).
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+  HI=$'\033[1;33m' CMD=$'\033[1;36m' OFF=$'\033[0m'
+else
+  HI="" CMD="" OFF=""
+fi
+
+# Stampa in evidenza i comandi git per pubblicare la versione corrente.
+publish_steps() {
+  echo "${HI}Per pubblicarla fai commit di tutto, crea il tag $TAG e fai il push:${OFF}"
+  echo "${CMD}  git add -A && git commit -m \"Versione $VERSION\"${OFF}"
+  echo "${CMD}  git tag $TAG && git push && git push origin $TAG${OFF}"
+}
+
+echo
+if (( CHECK )); then
+  echo "dist/ e README sono aggiornati alla versione $VERSION."
+elif [[ -n "$RELEASE" ]]; then
+  echo "$VERSION" > "$ROOT/VERSION"
+  echo "${HI}VERSION aggiornato a $VERSION, dist/ rigenerata.${OFF}"
+  publish_steps
+elif git -C "$ROOT" rev-parse -q --verify "refs/tags/$TAG" >/dev/null 2>&1; then
+  echo "${HI}Versione $VERSION. Attenzione: il tag $TAG esiste già.${OFF}"
+  echo "Se hai modificato le skill, passa a una nuova versione con ./build.sh --release <versione>"
+else
+  echo "Versione $VERSION pronta."
+  publish_steps
 fi

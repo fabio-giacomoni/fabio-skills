@@ -147,28 +147,70 @@ Può essere un proverbio classico, un proverbio variato, una similitudine o una 
 
 ## Aggiornamento
 
-```bash
-npx skills update
+Le skill installate sono una copia dei file al momento dell'installazione: non si aggiornano da sole. Quando esce una nuova versione vanno aggiornate, in modo diverso a seconda di dove le usi.
+
+### Capire se c'è una nuova versione
+
+Ogni versione pubblicata ha un tag su GitHub, ad esempio `v1.0.0`. L'elenco, con la più recente in alto, è nella pagina dei [tag del repository](https://github.com/fabio-giacomoni/fabio-skills/tags).
+
+Per sapere quale versione hai installato, guarda il file `manifest.json` che si trova dentro ogni skill (e dentro ogni ZIP):
+
+```json
+{
+  "name": "fabio",
+  "version": "1.0.0",
+  "tag": "v1.0.0",
+  "repository": "https://github.com/fabio-giacomoni/fabio-skills",
+  "updates": "https://github.com/fabio-giacomoni/fabio-skills/tags"
+}
 ```
+
+Se il `tag` del tuo manifest è più vecchio dell'ultimo tag su GitHub, c'è una nuova versione. Dove trovare il manifest:
+
+- **Da terminale**: `cat ~/.claude/skills/fabio/manifest.json` (o `.claude/skills/fabio/manifest.json` se hai installato nel progetto).
+- **App Claude e ChatGPT**: apri lo ZIP che avevi caricato, oppure il file `manifest.json` tra i file della skill nelle impostazioni.
+
+### Da terminale (CLI)
+
+```bash
+npx skills check     # dice se ci sono aggiornamenti, senza installare nulla
+npx skills update    # scarica e installa le nuove versioni
+```
+
+Se avevi copiato le cartelle a mano, ricopiale da `skills/`.
+
+### App Claude (desktop e web)
+
+1. Scarica di nuovo gli ZIP dalla tabella in [App Claude](#app-claude-desktop-e-web): i link puntano sempre all'ultima versione.
+2. Nella sezione **Skills** delle impostazioni carica i nuovi ZIP al posto di quelli vecchi. Se l'app non permette di sostituirli, elimina prima la skill vecchia e poi carica quella nuova.
+
+### ChatGPT
+
+- **Con le Skills**: come per l'app Claude, scarica i nuovi ZIP e ricaricali.
+- **Con un Progetto o un GPT personalizzato**: incolla di nuovo nelle istruzioni il contenuto aggiornato di `SKILL.md` e sostituisci i file caricati.
 
 ## Struttura
 
 ```
+VERSION                   # numero di versione, es. 1.0.0 (tag git v1.0.0)
+build.sh                  # scrive i manifest e rigenera gli ZIP in dist/
 assets/
 └── cover.png             # immagine di copertina
-build.sh                  # rigenera gli ZIP in dist/
-dist/
-├── fabio.zip             # ZIP pronti da caricare nelle app
+dist/                     # ZIP pronti da caricare nelle app, con il tag nel nome
+├── fabio.zip
 ├── fabio-economic.zip
 └── fabio-poet.zip
 skills/
 ├── fabio/
 │   ├── SKILL.md          # istruzioni per interpretare Fabio
-│   └── profilo.md        # profilo della personalità di Fabio
+│   ├── profilo.md        # profilo della personalità di Fabio
+│   └── manifest.json     # versione e tag (generato da build.sh)
 ├── fabio-economic/
-│   └── SKILL.md          # ricetta ed esempi delle verità economiche
+│   ├── SKILL.md          # ricetta ed esempi delle verità economiche
+│   └── manifest.json
 └── fabio-poet/
-    └── SKILL.md          # ricetta ed esempi di proverbi, similitudini e metafore
+    ├── SKILL.md          # ricetta ed esempi di proverbi, similitudini e metafore
+    └── manifest.json
 ```
 
 ## Modificare le skill
@@ -179,16 +221,29 @@ skills/
 
 ## Pubblicare
 
-Gli ZIP in `dist/` sono generati dalle cartelle in `skills/`: dopo ogni modifica a una skill vanno rigenerati prima di fare commit e push, altrimenti chi li scarica riceve la versione vecchia.
+Ogni pubblicazione ha un numero di versione, scritto nel file `VERSION`, a cui corrisponde un tag git con la `v` davanti (`1.1.0` → `v1.1.0`). Gli utenti confrontano quel tag con il loro `manifest.json` per sapere se devono aggiornare.
 
-```bash
-./build.sh            # controlla le skill e ricrea gli ZIP cambiati
-git add -A && git commit -m "..." && git push
-```
+1. Modifica le skill.
+2. Lancia il build con `--release` e la nuova versione:
+   ```bash
+   ./build.sh --release 1.1.0
+   ```
+   Al posto del numero puoi scrivere `patch`, `minor` o `major` per aumentare la cifra corrispondente della versione attuale (da `1.0.0`: `1.0.1`, `1.1.0`, `2.0.0`).
 
-Lo script è in bash e richiede il comando `zip` (su Debian/Ubuntu: `sudo apt install zip`). Crea uno ZIP per ogni cartella di `skills/` (quindi anche per le skill aggiunte in futuro), verifica che ogni `SKILL.md` abbia `name` e `description` validi e rimuove gli ZIP delle skill eliminate. Gli ZIP delle skill non modificate restano identici, quindi git segnala solo quelli davvero cambiati.
+   Lo script aggiorna `VERSION`, scrive `manifest.json` in ogni skill, rigenera gli ZIP in `dist/` con il tag nel nome (`fabio-v1.1.0.zip`), rimuove quelli della versione precedente e aggiorna i link agli ZIP in questo README. Se il tag esiste già o una skill non è valida si ferma senza toccare `VERSION`.
+3. Fai commit di tutto, crea il tag e pubblica. Lo script non esegue nessun comando git: alla fine stampa in evidenza i comandi con la versione giusta, da lanciare a mano:
+   ```bash
+   git add -A && git commit -m "Versione 1.1.0"
+   git tag v1.1.0 && git push && git push origin v1.1.0
+   ```
 
-Per controllare soltanto che `dist/` sia aggiornata, senza scrivere nulla:
+`--release` è facoltativo: in alternativa puoi aumentare a mano il numero nel file `VERSION` e lanciare `./build.sh` senza parametri, che rigenera manifest e ZIP con quella versione e stampa gli stessi comandi.
+
+Lo script è in bash e richiede il comando `zip` (su Debian/Ubuntu: `sudo apt install zip`). Crea uno ZIP per ogni cartella di `skills/` (quindi anche per le skill aggiunte in futuro), verifica che ogni `SKILL.md` abbia `name` e `description` validi e rimuove gli ZIP delle versioni precedenti e delle skill eliminate. I nomi degli ZIP citati in questo README (link di download compresi) vengono riscritti a ogni build con il tag corrente: non serve correggerli a mano. Se il tag della versione in `VERSION` esiste già, avvisa che il numero va aumentato.
+
+I file `manifest.json` sono generati: non modificarli a mano.
+
+Per controllare soltanto che manifest e ZIP siano aggiornati, senza scrivere nulla:
 
 ```bash
 ./build.sh --check
