@@ -53,15 +53,15 @@ In alternativa, a mano: copia le cartelle che ti interessano da `skills/` dentro
 
 Nell'app Claude e su claude.ai le skill non si installano da terminale: si caricano direttamente come file ZIP, uno per skill.
 
-**1. Scarica gli ZIP** dal repository [fabio-giacomoni/fabio-skills](https://github.com/fabio-giacomoni/fabio-skills). Clicca sul nome per scaricare il file:
+**1. Scarica gli ZIP** dal repository [fabio-giacomoni/fabio-skills](https://github.com/fabio-giacomoni/fabio-skills). Il nome di ogni ZIP contiene la versione (ad esempio `fabio-v1.0.0.zip`), qui indicata con `<versione>`. Apri la cartella [`dist/`](https://github.com/fabio-giacomoni/fabio-skills/tree/main/dist), clicca sul file che ti serve e poi sull'icona **Download raw file**:
 
 | File | Skill | Serve per |
 | --- | --- | --- |
-| [`fabio.zip`](https://github.com/fabio-giacomoni/fabio-skills/raw/main/dist/fabio.zip) | `/fabio` | parlare con Fabio |
-| [`fabio-economic.zip`](https://github.com/fabio-giacomoni/fabio-skills/raw/main/dist/fabio-economic.zip) | `/fabio-economic` | le verità economiche |
-| [`fabio-poet.zip`](https://github.com/fabio-giacomoni/fabio-skills/raw/main/dist/fabio-poet.zip) | `/fabio-poet` | i proverbi del poeta |
+| [`fabio-<versione>.zip`](https://github.com/fabio-giacomoni/fabio-skills/tree/main/dist) | `/fabio` | parlare con Fabio |
+| [`fabio-economic-<versione>.zip`](https://github.com/fabio-giacomoni/fabio-skills/tree/main/dist) | `/fabio-economic` | le verità economiche |
+| [`fabio-poet-<versione>.zip`](https://github.com/fabio-giacomoni/fabio-skills/tree/main/dist) | `/fabio-poet` | i proverbi del poeta |
 
-Per Fabio completo scaricali tutti e tre; altrimenti solo quello che ti interessa. In alternativa apri la cartella [`dist/`](https://github.com/fabio-giacomoni/fabio-skills/tree/main/dist) del repository, clicca sul file e poi sull'icona **Download raw file**.
+Per Fabio completo scaricali tutti e tre; altrimenti solo quello che ti interessa.
 
 Non estrarre gli ZIP: vanno caricati così come sono.
 
@@ -181,7 +181,7 @@ Se avevi copiato le cartelle a mano, ricopiale da `skills/`.
 
 ### App Claude (desktop e web)
 
-1. Scarica di nuovo gli ZIP dalla tabella in [App Claude](#app-claude-desktop-e-web): i link puntano sempre all'ultima versione.
+1. Scarica di nuovo gli ZIP dalla cartella [`dist/`](https://github.com/fabio-giacomoni/fabio-skills/tree/main/dist), che contiene sempre e solo l'ultima versione (vedi [App Claude](#app-claude-desktop-e-web)).
 2. Nella sezione **Skills** delle impostazioni carica i nuovi ZIP al posto di quelli vecchi. Se l'app non permette di sostituirli, elimina prima la skill vecchia e poi carica quella nuova.
 
 ### ChatGPT
@@ -197,9 +197,9 @@ build.sh                  # scrive i manifest e rigenera gli ZIP in dist/
 assets/
 └── cover.png             # immagine di copertina
 dist/                     # ZIP pronti da caricare nelle app, con il tag nel nome
-├── fabio.zip
-├── fabio-economic.zip
-└── fabio-poet.zip
+├── fabio-<versione>.zip
+├── fabio-economic-<versione>.zip
+└── fabio-poet-<versione>.zip
 skills/
 ├── fabio/
 │   ├── SKILL.md          # istruzioni per interpretare Fabio
@@ -230,7 +230,7 @@ Ogni pubblicazione ha un numero di versione, scritto nel file `VERSION`, a cui c
    ```
    Al posto del numero puoi scrivere `patch`, `minor` o `major` per aumentare la cifra corrispondente della versione attuale (da `1.0.0`: `1.0.1`, `1.1.0`, `2.0.0`).
 
-   Lo script aggiorna `VERSION`, scrive `manifest.json` in ogni skill, rigenera gli ZIP in `dist/` con il tag nel nome (`fabio-v1.1.0.zip`), rimuove quelli della versione precedente e aggiorna i link agli ZIP in questo README. Se il tag esiste già o una skill non è valida si ferma senza toccare `VERSION`.
+   Lo script aggiorna `VERSION`, scrive `manifest.json` in ogni skill, rigenera gli ZIP in `dist/` con il tag nel nome (`fabio-v1.1.0.zip`) e rimuove quelli della versione precedente. Se il tag esiste già o una skill non è valida si ferma senza toccare `VERSION`.
 3. Fai commit di tutto, crea il tag e pubblica. Lo script non esegue nessun comando git: alla fine stampa in evidenza i comandi con la versione giusta, da lanciare a mano:
    ```bash
    git add -A && git commit -m "Versione 1.1.0"
@@ -239,7 +239,7 @@ Ogni pubblicazione ha un numero di versione, scritto nel file `VERSION`, a cui c
 
 `--release` è facoltativo: in alternativa puoi aumentare a mano il numero nel file `VERSION` e lanciare `./build.sh` senza parametri, che rigenera manifest e ZIP con quella versione e stampa gli stessi comandi.
 
-Lo script è in bash e richiede il comando `zip` (su Debian/Ubuntu: `sudo apt install zip`). Crea uno ZIP per ogni cartella di `skills/` (quindi anche per le skill aggiunte in futuro), verifica che ogni `SKILL.md` abbia `name` e `description` validi e rimuove gli ZIP delle versioni precedenti e delle skill eliminate. I nomi degli ZIP citati in questo README (link di download compresi) vengono riscritti a ogni build con il tag corrente: non serve correggerli a mano. Se il tag della versione in `VERSION` esiste già, avvisa che il numero va aumentato.
+Lo script è in bash e richiede il comando `zip` (su Debian/Ubuntu: `sudo apt install zip`). Crea uno ZIP per ogni cartella di `skills/` (quindi anche per le skill aggiunte in futuro), verifica che ogni `SKILL.md` abbia `name` e `description` validi e rimuove gli ZIP delle versioni precedenti e delle skill eliminate. Se il tag della versione in `VERSION` esiste già, avvisa che il numero va aumentato.
 
 I file `manifest.json` sono generati: non modificarli a mano.
 

@@ -3,12 +3,11 @@
 #
 # La versione è nel file VERSION (es. 1.2.0) e corrisponde al tag git v1.2.0.
 # In ogni skill viene scritto un manifest.json con versione e tag, che finisce
-# anche dentro lo ZIP. Il tag è anche nel nome dello ZIP (dist/<skill>-v1.2.0.zip)
-# e i riferimenti agli ZIP nel README vengono riallineati a ogni build.
+# anche dentro lo ZIP. Il tag è anche nel nome dello ZIP (dist/<skill>-v1.2.0.zip).
 #
 # Uso:
 #   ./build.sh                    ricrea dist/<skill>-<tag>.zip per tutte le skill
-#   ./build.sh --check            non scrive nulla: esce con errore se dist/ o il README non sono aggiornati
+#   ./build.sh --check            non scrive nulla: esce con errore se dist/ non è aggiornata
 #   ./build.sh --release <vers>   aggiorna VERSION e ricrea gli ZIP con la nuova versione
 #
 # <vers> è un numero (es. 1.2.0) oppure patch, minor o major, che aumentano
@@ -155,7 +154,6 @@ build_zip() {
 failed=0
 found=0
 expected=" "
-names=()
 
 for dir in "$SKILLS"/*/; do
   [[ -d "$dir" ]] || continue
@@ -182,7 +180,6 @@ for dir in "$SKILLS"/*/; do
   zipname="$name-$TAG.zip"
   target="$DIST/$zipname"
   expected+="$zipname "
-  names+=("$name")
   build_zip "$dir" "$TMP/$name.zip"
 
   if [[ -f "$target" ]] && cmp -s "$TMP/$name.zip" "$target"; then
@@ -216,24 +213,6 @@ for stale in "$DIST"/*.zip; do
   fi
 done
 
-# Riallinea nel README i nomi degli ZIP (link e struttura) alla versione corrente.
-if (( ! failed )) && [[ -f "$ROOT/README.md" ]]; then
-  sed_args=()
-  for name in "${names[@]}"; do
-    sed_args+=(-e "s#(^|[^a-z0-9-])$name(-v[0-9]+\\.[0-9]+\\.[0-9]+)?\\.zip#\\1$name-$TAG.zip#g")
-  done
-  sed -E "${sed_args[@]}" "$ROOT/README.md" > "$TMP/README.md"
-  if cmp -s "$TMP/README.md" "$ROOT/README.md"; then
-    :
-  elif (( CHECK )); then
-    failed=1
-    echo "DA RIFARE   README.md (nomi degli ZIP)"
-  else
-    cp "$TMP/README.md" "$ROOT/README.md"
-    echo "aggiornato  README.md (nomi degli ZIP)"
-  fi
-fi
-
 if (( failed )); then
   echo
   if (( CHECK )); then
@@ -260,7 +239,7 @@ publish_steps() {
 
 echo
 if (( CHECK )); then
-  echo "dist/ e README sono aggiornati alla versione $VERSION."
+  echo "dist/ è aggiornata alla versione $VERSION."
 elif [[ -n "$RELEASE" ]]; then
   echo "$VERSION" > "$ROOT/VERSION"
   echo "${HI}VERSION aggiornato a $VERSION, dist/ rigenerata.${OFF}"
