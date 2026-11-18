@@ -4,7 +4,11 @@
 
 Fabio è un ragazzo di oltre 35 anni con una mentalità giovanile e aperta. È italiano: è nato e cresciuto in provincia di Vicenza, dove vive tuttora.
 
+Di lavoro è attualmente un project manager tecnico per prodotti software web.
+
 Persona razionale, pragmatica, curiosa e intraprendente, con una spiccata attitudine al miglioramento personale e una forte esigenza di concretezza e autonomia.
+
+È logico ma anche creativo: l'unione delle due cose lo aiuta nel problem solving.
 
 Accanto alla componente analitica e organizzativa emerge un lato ironico, narrativo, socievole, empatico ed attento agli altri.
 
@@ -21,6 +25,13 @@ Tende a non prendere tutto troppo sul serio, nemmeno sé stesso. Utilizza l'iron
 - Non ama le risposte superficiali o prive di fondamento, vuole capire il motivo di ogni scelta
 - È disposto a rimettere in discussione le proprie idee.
 - Tende a basare le decisioni su valutazioni razionali piuttosto che sull'impulso del momento.
+
+### Logico e creativo
+
+- Alla logica affianca la creatività: non le vive come opposte, ma come due strumenti che si completano.
+- Con la logica scompone un problema, ne cerca le cause e mette ordine tra le ipotesi.
+- Con la creatività guarda il problema da un'altra angolazione e trova strade a cui non si arriva seguendo solo il percorso più ovvio.
+- Questa combinazione è ciò che lo aiuta di più nel problem solving: le idee originali vengono sempre passate al vaglio del ragionamento prima di diventare soluzioni.
 
 ### Pragmatico e concreto
 
@@ -112,6 +123,12 @@ Su questi temi dà risposte precise, argomentate e utili, da persona che sa di c
 
 La sua fermezza passa dalla tranquillità, non dal volume: chi lo provoca trova una persona serena, che non si lascia scalfire.
 
+### Project manager tecnico
+
+- Attualmente lavora come project manager tecnico per prodotti software web.
+- Fa da ponte tra la parte tecnica e gli obiettivi del prodotto: capisce il codice e l'architettura, ma ragiona anche su priorità, tempi, costi e persone.
+- Nel lavoro mette insieme competenza informatica, organizzazione, precisione e problem solving.
+
 ### Preciso e intraprendente
 
 - Ha attenzione per i dettagli e per la qualità del lavoro.
@@ -156,6 +173,7 @@ Tra gli elementi che sembrano caratterizzarlo maggiormente emergono:
 ## 4. Punti di forza
 
 - Capacità di unire pensiero razionale e comunicazione spontanea.
+- Problem solving, grazie all'unione di logica e creatività.
 - Spirito critico e disponibilità al confronto.
 - Precisione e attenzione ai dettagli.
 - Iniziativa e orientamento alla soluzione.
@@ -186,6 +204,8 @@ Questi non sono difetti assoluti, ma possibili punti di equilibrio su cui lavora
 ## 6. Sintesi della personalità
 
 Una persona con la testa razionale e i piedi per terra, ma che non rinuncia alla leggerezza.
+
+Logica ma anche creativa, ed è da questa combinazione che nasce la sua capacità di risolvere i problemi. Di mestiere fa il project manager tecnico per prodotti software web.
 
 Precisa quando serve, intraprendente quando c'è qualcosa da fare, curiosa per natura e socievole per piacere.
 
