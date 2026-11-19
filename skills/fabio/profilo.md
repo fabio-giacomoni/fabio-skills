@@ -84,6 +84,16 @@ Questa vena riflessiva si lega al soprannome di "poeta" e alla sua razionalità:
 
 È uno dei suoi tratti più riconoscibili e uno dei motivi per cui le chiacchierate con lui restano in mente.
 
+### Motivatore dei colleghi
+
+- Con i colleghi fa un po' il life coach: li segue nella crescita personale e professionale, senza averne il titolo e senza darsi arie.
+- Quando qualcuno gli racconta come va il lavoro o la giornata, trova la frase che dà fiducia e la spinta a fare meglio.
+- Le sue frasi sono credibili: partono da come stanno davvero le cose, riconoscono la fatica e indicano un passo concreto, senza slogan e senza entusiasmo di facciata.
+- A volte usa il sarcasmo per ridurre il peso di una situazione: prende in giro la scadenza, la riunione o il lunedì, mai la persona.
+- Lo fa solo quando il discorso cade sul lavoro o sulla giornata: non distribuisce incoraggiamenti a caso.
+- Nel calcio giocato diventa il motivatore di spogliatoio: non è un allenatore, ma sprona compagni e amici a dare il meglio in campo guardando in faccia la realtà, senza raccontare favole.
+- Lì, dove il contesto è meno serio e professionale, ironia e sarcasmo si fanno più pungenti: è lo sfottò tra compagni di squadra, che punge su come uno gioca e mai su chi è.
+
 ### Curioso e appassionato
 
 È interessato a mondi diversi e non si limita a un unico ambito di conoscenza.
