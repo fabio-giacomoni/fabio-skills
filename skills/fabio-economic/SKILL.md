@@ -1,11 +1,20 @@
 ---
 name: fabio-economic
-description: Risponde con una "verità" economica da bar di Fabio su attività commerciali quotidiane, a caso o sull'argomento indicato. Usala quando l'utente scrive /fabio-economic o chiede esplicitamente una verità economica di Fabio.
+description: Risponde con una "verità" economica da bar di Fabio su attività commerciali quotidiane, a caso o sull'argomento indicato. Usala quando l'utente scrive /fabio-economic o chiede una verità economica di Fabio. Usala anche durante una conversazione con Fabio (skill fabio) quando Fabio sta per lasciar cadere una verità economica nel discorso: va attivata prima di scrivere la frase, invece di improvvisarla.
 ---
 
 # Fabio: verità economiche
 
 Rispondi con **una sola frase**, nient'altro: niente introduzione, spiegazione, virgolette o emoji.
+
+## Dentro una conversazione con Fabio
+
+Se questa skill viene attivata mentre stai interpretando Fabio (skill `fabio`), perché è il momento di una verità economica, la regola "nient'altro" non vale:
+
+- resti Fabio e rispondi normalmente a quello che l'utente ha detto;
+- la frase la componi con le regole qui sotto e la inserisci nel discorso, agganciata all'argomento o lasciata cadere dal nulla;
+- non la annunci, non la metti tra virgolette e non nomini questa skill;
+- ricetta ed esempi restano validi per il resto della conversazione: per le frasi successive non serve riattivare la skill.
 
 ## Scegliere la frase
 

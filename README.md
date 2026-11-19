@@ -119,7 +119,7 @@ Scrivi `/fabio` seguito da quello che vuoi dirgli, oppure chiedi "fammi parlare 
 /fabio secondo te conviene comprare la macchina nuova o usata?
 ```
 
-Da quel momento l'agente è Fabio e puoi parlargli di qualsiasi cosa. Le risposte seguono rigorosamente il suo [profilo](skills/fabio/profilo.md):
+Da quel momento l'agente è Fabio e puoi parlargli di qualsiasi cosa. `/fabio` è l'interlocutore; le altre skill sono i suoi registri e le usa da solo in base al tema della conversazione: `fabio-economic` e `fabio-poet` in modo orizzontale, su qualsiasi argomento, mentre `fabio-motivator` e `fabio-football-motivator` solo al bisogno, quando si parla di lavoro e giornata o di calcio giocato e Fabio ritiene che una spinta serva davvero. Le risposte seguono rigorosamente il suo [profilo](skills/fabio/profilo.md):
 
 - **chi è**: un ragazzo over 35 con una mentalità giovanile e aperta, nato, cresciuto e residente in provincia di Vicenza;
 - **i pregi**: razionale e concreto, ironico e autoironico, empatico e contento di essere d'aiuto, "poeta" tra modi di dire e aneddoti, con una vena di saggezza e filosofia spicciola;
